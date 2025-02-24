@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import scrapy
 import re
 
@@ -37,6 +38,11 @@ class UOWSSPider(scrapy.Spider):
             il.add_value(key, value)
         
         il.add_value("course_website", response.url)
+        duration = response.xpath("//a[contains(., 'Sample') and contains(., 'Plan')]/text()")
+        if duration:
+            il.add_value("duration_raw", duration)
+            il.add_value("duration", duration)
+            il.add_value("duration_term", duration)
         il.add_xpath("course_name", "//h1")
 
         il.add_xpath("course_des", "//div[contains(., 'Overview')] | //div[contains(@id, 'overview')]")
@@ -45,6 +51,23 @@ class UOWSSPider(scrapy.Spider):
         il.add_xpath("career", "//h2[contains(@id, 'career')]/following-sibling::*")
         il.add_xpath("career_html", "//h2[contains(@id, 'career')]/following-sibling::*")
 
+        program_url = response.xpath("//a[contains(., 'Required Courses')]/@href")
+
         
 
-        yield il.load_item()
+        yield response.follow(program_url, callback=self.parse2, meta = {
+            "il": il
+            })
+
+    def parse2(self, response):
+        il = response.meta.get("il")
+
+        
+
+
+
+
+
+
+
+
