@@ -16,7 +16,7 @@ def ielts_score_cleaner(item):
         return item
 
 def fee_cleaner(item):
-    match = re.search(r"£\s*(\d+\,?\d+)", item)
+    match = re.search(r"\$\s*(\d+\,?\d+)", item)
     if match:
         return match.group(1)
     else:
@@ -301,7 +301,7 @@ class CustomItem(scrapy.Item):
     course_name = scrapy.Field(input_processor=MapCompose(remove_tags, replace_entities, course_name_cleaner,  strip_item), output_processor=Join())
     course_des = scrapy.Field(input_processor=MapCompose(remove_img, remove_figure, remove_hidden, replace_entities, strip_item, remove_button, html_to_text), output_processor=Join())
     course_des_html = scrapy.Field(input_processor=MapCompose(remove_img, remove_figure, strip_item, replace_entities), output_processor=Join())
-    college = scrapy.Field(output_processor=Join(separator=", "))
+    college = scrapy.Field(input_processor=MapCompose(remove_tags, replace_entities, strip_item), output_processor=Join(separator=", "))
 
     city = scrapy.Field(input_processor=MapCompose(remove_tags, strip_item), output_processor=Compose(custom_join))
     intake_month = scrapy.Field(input_processor=MapCompose(remove_tags, strip_item), output_processor=Compose(custom_join))
@@ -328,7 +328,7 @@ class CustomItem(scrapy.Item):
 
     duration_term = scrapy.Field(input_processor=MapCompose(remove_tags, duration_term_cleaner), output_processor=Join())
 
-    degree = scrapy.Field(input_processor=MapCompose(remove_tags, strip_item, degree_cleaner), output_processor=Join())
+    degree = scrapy.Field(input_processor=MapCompose(remove_tags, replace_entities, strip_item, degree_cleaner), output_processor=Join())
     degree_category = scrapy.Field(output_processor=Join())
     degree_eligibility = scrapy.Field(output_processor=Join())
     apply_month = scrapy.Field(output_processor=Join())
@@ -386,6 +386,7 @@ class CustomItem(scrapy.Item):
     scholarship = scrapy.Field(input_processor=MapCompose(remove_tags, replace_entities), output_processor=Join())
  
     course_meta = scrapy.Field(output_processor=Join())
+    credit_hours = scrapy.Field(input_processor=MapCompose(remove_tags, replace_entities), output_processor=Join())
     # key = scrapy.Field(output_processor=Join())
     # fee_link = scrapy.Field(output_processor=Join())
     # sub_category = scrapy.Field(output_processor=Join())
